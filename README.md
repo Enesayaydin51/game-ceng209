@@ -34,7 +34,7 @@ gcc -o dungeon_game main.c -lm
 
 ## Usage
 Game Commands
-move <direction>: Moves the player in a specific direction (north, south, east, west).
+move <direction>: Moves the player in a specific direction (right, left, up , down).
 look: Displays the description of the current room.
 pickup: Takes an item from the room. (Items cannot be taken if creatures are alive in the room.)
 attack: Engages in combat with a creature in the room.
