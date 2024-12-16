@@ -32,7 +32,7 @@ gcc -o dungeon_game main.c -lm
 4.Run the game:
 ./dungeon_game
 
-Usage
+## Usage
 Game Commands
 move <direction>: Moves the player in a specific direction (north, south, east, west).
 look: Displays the description of the current room.
@@ -43,7 +43,7 @@ save: Saves the current game state.
 load: Loads a previously saved game.
 exit: Exits the game.
 
-Structures
+## Structures
 Room Structure
 Each room contains descriptions, creatures, traps, and items. When the player enters a room, the content of the room is checked.
 
