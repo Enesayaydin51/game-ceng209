@@ -17,17 +17,9 @@ typedef struct Creature {
     int strength;
 } Creature;
 
-typedef enum {
-    PHYSICAL_DAMAGE, // Fiziksel hasar
-    POISON_DAMAGE,   // Zehir hasarı
-    MAGIC_DAMAGE     // Büyüsel hasar
-} DamageType;
-
-
 typedef struct Trap {
     char description[MAX_TRAP_DESC_LENGTH];
     int damage;
-    DamageType damage_type; // Hasar türü
 } Trap;
 
 
