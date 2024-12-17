@@ -344,15 +344,32 @@ void apply_item_effect(Player* player, ItemType item) {
 
 
 void add_item_to_inventory(Player* player, Room* room) {
-    
-    
-    
-    if (player->inventory_count < MAX_INVENTORY_SIZE) {
+    // Tuzak hasarı
+    const int trap_damage = 5;
+
+    // Eğer odada bir yaratık varsa, eşyayı alamaz ve tuzağa düşer
+    if (room->creature != NULL) {
+        printf("You cannot pick up the item while the %s is still alive! Defeat it first.\n", room->creature->name);
+        
+        // Tuzağın etkisi: oyuncuya hasar verir
+        player->health -= trap_damage;
+        printf("A trap activates! You take %d damage. Your current health: %d\n", trap_damage, player->health);
+
+        // Eğer oyuncunun sağlığı sıfırın altına düşerse
+        if (player->health <= 0) {
+            printf("You have died from the trap!\n");
+            // Oyunun sonlanması için bir işlem ekleyebilirsin
+        }
+        return;
+    }
+
+    // Eğer envanterde yer varsa, eşyayı ekle
+    if (player->inventory_count < MAX_INVENTORY_SIZE && strlen(room->contains) > 0) {
         // Eşyayı envantere ekle
         strcpy(player->inventory[player->inventory_count], room->contains);
         player->inventory_count++;
         printf("Picked up: %s\n", room->contains);
-        
+
         // Odaya ait eşyayı enum'a çevir ve etkilerini uygula
         ItemType item = ITEM_NONE;  // Varsayılan olarak ITEM_NONE
         if (strcmp(room->contains, "SWORD") == 0) {
@@ -369,6 +386,8 @@ void add_item_to_inventory(Player* player, Room* room) {
 
         // Odaya ait eşyayı sıfırla (artık odada olmayacak)
         strcpy(room->contains, "");
+    } else if (strlen(room->contains) == 0) {
+        printf("There is no item to pick up here.\n");
     } else {
         printf("Inventory is full!\n");
     }
