@@ -285,7 +285,7 @@ void show_possible_directions(Player* player) {
     }
 }
 void move_player(Player* player, const char* direction) {
-    // Mevcut odadan gidebileceğiniz yönleri göster
+    // Mevcut odadan gidebileceğiniz yönleri gösterir
     show_possible_directions(player);
 
     Room* new_room = NULL;
@@ -350,20 +350,19 @@ void add_item_to_inventory(Player* player, Room* room) {
         // Eğer oyuncunun sağlığı sıfırın altına düşerse
         if (player->health <= 0) {
             printf("You have died from the trap!\n");
-            // Oyunun sonlanması için bir işlem ekleyebilirsin
+            
         }
         return;
     }
 
     // Eğer envanterde yer varsa, eşyayı ekle
     if (player->inventory_count < MAX_INVENTORY_SIZE && strlen(room->contains) > 0) {
-        // Eşyayı envantere ekle
         strcpy(player->inventory[player->inventory_count], room->contains);
         player->inventory_count++;
         printf("Picked up: %s\n", room->contains);
 
         // Odaya ait eşyayı enum'a çevir ve etkilerini uygula
-        ItemType item = ITEM_NONE;  // Varsayılan olarak ITEM_NONE
+        ItemType item = ITEM_NONE;  
         if (strcmp(room->contains, "SWORD") == 0) {
             item = SWORD;
         } else if (strcmp(room->contains, "BANDAGE") == 0) {
@@ -376,7 +375,7 @@ void add_item_to_inventory(Player* player, Room* room) {
 
         apply_item_effect(player, item);
 
-        // Odaya ait eşyayı sıfırla (artık odada olmayacak)
+        // Odaya ait eşyayı sıfırla 
         strcpy(room->contains, "");
     } else if (strlen(room->contains) == 0) {
         printf("There is no item to pick up here.\n");
@@ -430,29 +429,29 @@ void save_game(Player* player, Room* rooms[], int room_count, const char* save_n
         return;
     }
 
-    // Player bilgilerini kaydet
+    // Oyuncu bilgilerini kaydet
     fwrite(player, sizeof(Player), 1, file);
 
-    // Oda bilgilerini kaydet
     for (int i = 0; i < room_count; ++i) {
+        // Oda bilgilerini kaydet
         fwrite(rooms[i], sizeof(Room), 1, file);
-        
-        // Her odadaki yaratıkları kaydet
+
+        // Yaratıkları kaydet
         if (rooms[i]->creature != NULL) {
-            fwrite(rooms[i]->creature, sizeof(Creature), 1, file);
+            Creature* creature = rooms[i]->creature;
+            fwrite(creature, sizeof(Creature), 1, file);
         } else {
-            // Yaratık yoksa NULL olarak kaydet
-            Creature dummy = {0};
-            fwrite(&dummy, sizeof(Creature), 1, file);
+            Creature empty_creature = {0};  // Boş bir yaratık oluştur
+            fwrite(&empty_creature, sizeof(Creature), 1, file);
         }
-        
-        // Her odadaki tuzakları kaydet
+
+        // Tuzakları kaydet
         if (rooms[i]->trap != NULL) {
-            fwrite(rooms[i]->trap, sizeof(Trap), 1, file);
+            Trap* trap = rooms[i]->trap;
+            fwrite(trap, sizeof(Trap), 1, file);
         } else {
-            // Tuzak yoksa NULL olarak kaydet
-            Trap dummy_trap = {0};
-            fwrite(&dummy_trap, sizeof(Trap), 1, file);
+            Trap empty_trap = {0};  // Boş bir tuzak oluştur
+            fwrite(&empty_trap, sizeof(Trap), 1, file);
         }
     }
 
@@ -473,22 +472,26 @@ Player* load_game(Room* rooms[], int room_count, const char* save_name) {
     for (int i = 0; i < room_count; ++i) {
         fread(rooms[i], sizeof(Room), 1, file);
 
-        // Yaratığı yükle
+        // Yaratıkları yükle
         Creature* creature = NULL;
-        fread(&creature, sizeof(Creature), 1, file);
+        creature = (Creature*)malloc(sizeof(Creature));  // Bellek ayır
+        fread(creature, sizeof(Creature), 1, file);
         if (creature->name[0] != '\0') {
             rooms[i]->creature = creature;  // Yaratığı odada yeniden oluştur
         } else {
             rooms[i]->creature = NULL;  // Yaratık yoksa NULL
+            free(creature);  // Eğer yaratık yoksa belleği serbest bırak
         }
 
         // Tuzakları yükle
         Trap* trap = NULL;
-        fread(&trap, sizeof(Trap), 1, file);
+        trap = (Trap*)malloc(sizeof(Trap));  // Bellek ayır
+        fread(trap, sizeof(Trap), 1, file);
         if (trap->description[0] != '\0') {
             rooms[i]->trap = trap;  // Tuzak varsa odada tekrar oluştur
         } else {
             rooms[i]->trap = NULL;  // Tuzak yoksa NULL
+            free(trap);  // Eğer tuzak yoksa belleği serbest bırak
         }
     }
 
